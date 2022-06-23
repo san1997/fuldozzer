@@ -2,9 +2,10 @@ import React from 'react'
 import { Route } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { LinkContainer } from 'react-router-bootstrap'
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
+import { Navbar, Nav, Container, NavDropdown, Image } from 'react-bootstrap'
 import SearchBox from './SearchBox'
 import { logout } from '../actions/userActions'
+import './Header.css';
 
 const Header = () => {
 	const dispatch = useDispatch()
@@ -27,23 +28,20 @@ const Header = () => {
 				collapseOnSelect
 			>
 				<Container>
-					{/* Melvin Kisten */}
-					<a
-						rel='noopener noreferrer'
-						href='https://github.com/iammelvink'
-						target='_blank'
-						className='melvin-kisten'
-					>
-						<i className='fas fa-user-circle'></i> Melvin Kisten Github
-					</a>
 					{/* Home */}
 					<LinkContainer to='/'>
-						<Navbar.Brand>React E-Commerce</Navbar.Brand>
+						<Image
+							className="company-logo"
+							src={'https://www.kindpng.com/picc/m/90-904149_pharmacy-capsule-logo-clipart-png-download-transparent-png.png'} 
+							fluid />
 					</LinkContainer>
 					<Navbar.Toggle aria-controls='basic-navbar-nav' />
 					<Navbar.Collapse id='basic-navbar-nav'>
-						<Route render={({ history }) => <SearchBox history={history} />} />
-						<Nav className='ml-auto'>
+						<div className='nav-search' >
+						<Route render={({ history }) => <SearchBox  history={history} />} />
+						</div>
+						
+						<Nav className='nav-operations'>
 							{/* Cart */}
 							<LinkContainer to='/cart'>
 								<Nav.Link>

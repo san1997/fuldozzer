@@ -10,12 +10,19 @@ import ProductCarousel from '../components/ProductCarousel'
 import Meta from '../components/Meta'
 import { listProducts } from '../actions/productActions'
 
-const HomeScreen = ({ match }) => {
+const HomeScreen = ({ match, history }) => {
 	const keyword = match.params.keyword
 
 	const pageNumber = match.params.pageNumber || 1
 
 	const dispatch = useDispatch()
+
+	// useeSelector to get login state
+	const userLogin = useSelector((state) => state.userLogin)
+	const { userInfo } = userLogin
+	if (!userInfo) {
+		history.replace('/login');
+	}
 
 	// useSelector is to grab what we want from the state
 	const productList = useSelector((state) => state.productList)

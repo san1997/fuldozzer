@@ -1,0 +1,11 @@
+.company-logo{
+    width: 80px;
+}
+
+.nav-search{
+    flex: 3;
+}
+
+.nav-operations {
+    flex: 1;
+}
