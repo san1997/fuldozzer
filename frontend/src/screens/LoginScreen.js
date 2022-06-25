@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import FormContainer from '../components/FormContainer'
-import { login } from '../actions/userActions'
+import { login, forgotPassword } from '../actions/userActions'
+import Swal from 'sweetalert2'
 
 const LoginScreen = ({ location, history }) => {
 	const [email, setEmail] = useState('')
@@ -28,6 +29,23 @@ const LoginScreen = ({ location, history }) => {
 		},
 		[history, userInfo, redirect] // Dependencies, on change they fire off useEffect
 	)
+
+	const handleForgotPassword = () => {
+		if (!email.length) {
+			Swal.fire({
+				icon: 'error',
+				title: 'Oops...',
+				text: 'Please enter email and then click forgot password.',
+			})
+		}
+
+		dispatch(forgotPassword(email));
+		Swal.fire({
+			icon: 'success',
+			title: 'Email Sent',
+			text: 'Please check your mailbox and follow instructions to reset password.',
+		})
+	}
 
 	const submitHandler = (e) => {
 		e.preventDefault()
@@ -69,6 +87,13 @@ const LoginScreen = ({ location, history }) => {
 					Sign In
 				</Button>
 			</Form>
+			<Row className='py-3'>
+				<Col>
+					<div onClick={() => handleForgotPassword()}>
+						Forgot Password ?
+					</div>
+				</Col>
+			</Row>
 			{/* Register */}
 			<Row className='py-3'>
 				<Col>

@@ -24,6 +24,9 @@ import {
 	USER_UPDATE_REQUEST,
 	USER_UPDATE_SUCCESS,
 	USER_UPDATE_FAIL,
+	USER_FORGOT_PASSWORD_REQUEST,
+	USER_FORGOT_PASSWORD_SUCCESS,
+	USER_FORGOT_PASSWORD_FAIL
 } from '../constants/userConstants'
 import { ORDER_LIST_MY_RESET } from '../constants/orderConstants'
 
@@ -297,6 +300,41 @@ export const updateUser = (user) => async (dispatch, getState) => {
 		dispatch({
 			type: USER_UPDATE_FAIL,
 			payload: message,
+		})
+	}
+}
+
+// Actions to login
+export const forgotPassword = (email) => async (dispatch) => {
+	try {
+		dispatch({ type: USER_FORGOT_PASSWORD_REQUEST })
+
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}
+
+		// Make post request to login
+		const { data } = await axios.put(
+			'/api/users/forgot-password',
+			{ email },
+			config
+		)
+
+		dispatch({
+			type: USER_FORGOT_PASSWORD_SUCCESS,
+			payload: data,
+		})
+	} catch (error) {
+		dispatch({
+			type: USER_FORGOT_PASSWORD_FAIL,
+			payload:
+				// Send a custom error message
+				// Else send a generic error message
+				error.response && error.response.data.message
+					? error.response.data.message
+					: error.message,
 		})
 	}
 }

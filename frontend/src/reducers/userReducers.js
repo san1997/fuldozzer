@@ -25,6 +25,9 @@ import {
 	USER_UPDATE_SUCCESS,
 	USER_UPDATE_FAIL,
 	USER_UPDATE_RESET,
+	USER_FORGOT_PASSWORD_REQUEST,
+	USER_FORGOT_PASSWORD_SUCCESS,
+	USER_FORGOT_PASSWORD_FAIL
 } from '../constants/userConstants'
 
 // userLoginReducer for users
@@ -202,6 +205,31 @@ export const userUpdateReducer = (state = { user: {} }, action) => {
 
 		case USER_UPDATE_RESET:
 			return { user: {} }
+
+		// In any other case, just return the state
+		default:
+			return state
+	}
+}
+
+// userForgotPasswordReducer for users
+export const userForgotPasswordReducer = (state = {}, action) => {
+	switch (action.type) {
+		// loading will NOT be done yet, so true
+		case USER_FORGOT_PASSWORD_REQUEST:
+			return { loading: true }
+
+		// On success
+		// userInfo will contain data as a payload
+		// loading will be done, so false
+		case USER_FORGOT_PASSWORD_SUCCESS:
+			return { loading: false, userInfo: action.payload }
+
+		// On fail
+		// the error will contain the payload
+		// loading will be done, so false
+		case USER_FORGOT_PASSWORD_FAIL:
+			return { loading: false, error: action.payload }
 
 		// In any other case, just return the state
 		default:
