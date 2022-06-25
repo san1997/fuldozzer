@@ -1,9 +1,12 @@
 import path from 'path'
 import express from 'express'
-import multer from 'multer'
+import multer from 'multer';
+import { storage } from '../../firebase.js';
+import { ref, getDownloadURL, uploadBytes, uploadBytesResumable } from "firebase/storage";
+
 const router = express.Router()
 
-const storage = multer.diskStorage({
+const filestorage = multer.diskStorage({
 	destination(req, file, cb) {
 		cb(null, 'uploads/')
 	},
@@ -35,14 +38,30 @@ function checkFileType(file, cb) {
 }
 
 const upload = multer({
-	storage,
+	storage: multer.memoryStorage(),
 	fileFilter: function (req, file, cb) {
 		checkFileType(file, cb)
 	},
 })
 
+const uploadCloudImage = (req, res) => {
+	const file = req.file;
+	const filename = `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
+	const imageRef = ref(storage, 'uploads/'+ filename);
+	const metatype = { contentType: file.mimetype, name: filename };
+	
+	return uploadBytes(imageRef, file.buffer, metatype)
+		.then(snapshot => getDownloadURL(imageRef))
+		.then(url => {
+			console.log('url', url);
+			res.send(url);
+		})
+		.catch((error) => console.log('err', error.message));
+	
+}
+
 router.post('/', upload.single('image'), (req, res) => {
-	res.send(`/${req.file.path}`)
+	uploadCloudImage(req, res);
 })
 
 export default router
