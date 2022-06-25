@@ -164,14 +164,14 @@ const forgotPassword = asyncHandler(async (req, res) => {
 	if (user) {
 		const token = generateResetToken(user._id);
 		var currentDate = new Date();
-		const url = `http://localhost:3000/resetpassword/${token}`;
+		const url = `http://localhost:3000/reset-password/${token}`;
 		console.log({ url });
 		const data = {
 		from: "me@samples.mailgun.org",
 		to: email,
 		subject: "password reset",
 		html: ` <p>Hey we have received request for reset your account password </p>
-			<h3> <a href="http://localhost:3000/resetpassword/${token}">click here</a></h3>
+			<h3> <a href="http://localhost:3000/reset-password/${token}">click here</a></h3>
 			${url}
 			`,
 		};

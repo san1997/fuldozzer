@@ -19,6 +19,7 @@ import UserEditScreen from './screens/UserEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
+import ResetPasswordScreen from './screens/ResetPasswordScreen'
 
 const App = () => {
 	return (
@@ -30,6 +31,8 @@ const App = () => {
 					<Route path='/login' component={LoginScreen} />
 					{/* RegisterScreen */}
 					<Route path='/register' component={RegisterScreen} />
+					{/* ResetPasswordScreen */}
+					<Route path='/reset-password/:token' component={ResetPasswordScreen} />
 					{/* ProfileScreen */}
 					<Route path='/profile' component={ProfileScreen} />
 					{/* ShippingScreen */}
