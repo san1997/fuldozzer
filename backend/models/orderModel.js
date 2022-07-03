@@ -32,8 +32,8 @@ const orderSchema = mongoose.Schema(
 			required: true,
 		},
 		paymentResult: {
-			id: { type: String },
-			status: { type: String },
+			orderCreationId: { type: String },
+			razorpayPaymentId: { type: String },
 			update_time: { type: String },
 			email_address: { type: String },
 		},

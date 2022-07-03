@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
@@ -7,6 +8,94 @@ import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../actions/orderActions'
 import { USER_DETAILS_RESET } from '../constants/userConstants'
 import { ORDER_CREATE_RESET } from '../constants/orderConstants'
+
+function loadScript(src) {
+	return new Promise((resolve) => {
+		const script = document.createElement("script");
+		script.src = src;
+		script.onload = () => {
+			resolve(true);
+		};
+		script.onerror = () => {
+			resolve(false);
+		};
+		document.body.appendChild(script);
+	});
+}
+
+async function displayRazorpay(cart) {
+	const res = await loadScript(
+		"https://checkout.razorpay.com/v1/checkout.js"
+	);
+
+	if (!res) {
+		alert("Razorpay SDK failed to load. Are you online?");
+		return;
+	}
+	
+	const order = {
+		orderItems: cart.cartItems,
+		shippingAddress: cart.shippingAddress,
+		paymentMethod: cart.paymentMethod,
+		itemsPrice: cart.itemsPrice,
+		shippingPrice: cart.shippingPrice,
+		taxPrice: cart.taxPrice,
+		totalPrice: cart.totalPrice,
+	};
+	const userInfo = JSON.parse(localStorage.userInfo);
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${userInfo.token}`,
+		},
+	}
+	const result = await axios.post('/api/orders', order, config)
+
+
+	if (!result) {
+		alert("Server error. Are you online?");
+		return;
+	}
+
+	const { totalPrice: amount, _id: order_id, } = result.data;
+	const currency = 'INR';
+
+	const options = {
+		key: "rzp_test_dk4BPSwoZtpWAj", // Enter the Key ID generated from the Dashboard
+		amount: (parseInt(amount * 100)).toString(),
+		currency: currency,
+		name: "Fuldozzer",
+		description: "Pay",
+		// order_id: order_id,
+		handler: async function (response) {
+			const data = {
+				orderCreationId: order_id,
+				razorpayPaymentId: response.razorpay_payment_id,
+				razorpayOrderId: response.razorpay_order_id,
+				razorpaySignature: response.razorpay_signature,
+			};
+
+			const update_order = await axios.put(`/api/orders/${order_id}/pay`, data, config);
+
+			console.log('data', update_order);
+			localStorage.removeItem('cartItems')
+		},
+		prefill: {
+			name: userInfo.name,
+			email: userInfo.email,
+			contact: "9999999999",
+		},
+		notes: {
+			address: "Soumya Dey Corporate Office",
+		},
+		theme: {
+			color: "#61dafb",
+		},
+	};
+
+	const paymentObject = new window.Razorpay(options);
+	paymentObject.open();
+}
 
 const PlaceOrderScreen = ({ history }) => {
 	const dispatch = useDispatch()
@@ -64,7 +153,7 @@ const PlaceOrderScreen = ({ history }) => {
 
 	return (
 		<>
-			<CheckoutSteps step1 step2 step3 step4 />
+			<CheckoutSteps step1 step2 step3 />
 			<Row>
 				{/* Left Steps Summary */}
 				<Col md={8}>
@@ -110,7 +199,7 @@ const PlaceOrderScreen = ({ history }) => {
 													</Link>
 												</Col>
 												<Col md={4}>
-													{item.qty} x R{item.price} = R{item.qty * item.price}
+													{item.qty} x Rs{item.price} = Rs{item.qty * item.price}
 												</Col>
 											</Row>
 										</ListGroup.Item>
@@ -130,19 +219,19 @@ const PlaceOrderScreen = ({ history }) => {
 							<ListGroup.Item className='push-to-right'>
 								<Row>
 									<Col>Items</Col>
-									<Col>R{cart.itemsPrice}</Col>
+									<Col>Rs{cart.itemsPrice}</Col>
 								</Row>
 							</ListGroup.Item>
 							<ListGroup.Item className='push-to-right'>
 								<Row>
 									<Col>Shipping</Col>
-									<Col>R{cart.shippingPrice}</Col>
+									<Col>Rs{cart.shippingPrice}</Col>
 								</Row>
 							</ListGroup.Item>
 							<ListGroup.Item className='push-to-right'>
 								<Row>
 									<Col>Tax</Col>
-									<Col>R{cart.taxPrice}</Col>
+									<Col>Rs{cart.taxPrice}</Col>
 								</Row>
 							</ListGroup.Item>
 							<ListGroup.Item className='push-to-right'>
@@ -151,7 +240,7 @@ const PlaceOrderScreen = ({ history }) => {
 										<strong>Total</strong>
 									</Col>
 									<Col>
-										<strong>R{cart.totalPrice}</strong>
+										<strong>Rs{cart.totalPrice}</strong>
 									</Col>
 								</Row>
 							</ListGroup.Item>
@@ -163,7 +252,7 @@ const PlaceOrderScreen = ({ history }) => {
 									type='button'
 									className='btn-block'
 									disabled={cart.cartItems === 0}
-									onClick={placeOrderHandler}
+									onClick={() => displayRazorpay(cart)}
 								>
 									Place Order
 								</Button>
