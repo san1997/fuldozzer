@@ -5,97 +5,8 @@ import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import CheckoutSteps from '../components/CheckoutSteps'
-import { createOrder } from '../actions/orderActions'
 import { USER_DETAILS_RESET } from '../constants/userConstants'
 import { ORDER_CREATE_RESET } from '../constants/orderConstants'
-
-function loadScript(src) {
-	return new Promise((resolve) => {
-		const script = document.createElement("script");
-		script.src = src;
-		script.onload = () => {
-			resolve(true);
-		};
-		script.onerror = () => {
-			resolve(false);
-		};
-		document.body.appendChild(script);
-	});
-}
-
-async function displayRazorpay(cart) {
-	const res = await loadScript(
-		"https://checkout.razorpay.com/v1/checkout.js"
-	);
-
-	if (!res) {
-		alert("Razorpay SDK failed to load. Are you online?");
-		return;
-	}
-	
-	const order = {
-		orderItems: cart.cartItems,
-		shippingAddress: cart.shippingAddress,
-		paymentMethod: cart.paymentMethod,
-		itemsPrice: cart.itemsPrice,
-		shippingPrice: cart.shippingPrice,
-		taxPrice: cart.taxPrice,
-		totalPrice: cart.totalPrice,
-	};
-	const userInfo = JSON.parse(localStorage.userInfo);
-	const config = {
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${userInfo.token}`,
-		},
-	}
-	const result = await axios.post('/api/orders', order, config)
-
-
-	if (!result) {
-		alert("Server error. Are you online?");
-		return;
-	}
-
-	const { totalPrice: amount, _id: order_id, } = result.data;
-	const currency = 'INR';
-
-	const options = {
-		key: "rzp_test_dk4BPSwoZtpWAj", // Enter the Key ID generated from the Dashboard
-		amount: (parseInt(amount * 100)).toString(),
-		currency: currency,
-		name: "Fuldozzer",
-		description: "Pay",
-		// order_id: order_id,
-		handler: async function (response) {
-			const data = {
-				orderCreationId: order_id,
-				razorpayPaymentId: response.razorpay_payment_id,
-				razorpayOrderId: response.razorpay_order_id,
-				razorpaySignature: response.razorpay_signature,
-			};
-
-			const update_order = await axios.put(`/api/orders/${order_id}/pay`, data, config);
-
-			console.log('data', update_order);
-			localStorage.removeItem('cartItems')
-		},
-		prefill: {
-			name: userInfo.name,
-			email: userInfo.email,
-			contact: "9999999999",
-		},
-		notes: {
-			address: "Soumya Dey Corporate Office",
-		},
-		theme: {
-			color: "#61dafb",
-		},
-	};
-
-	const paymentObject = new window.Razorpay(options);
-	paymentObject.open();
-}
 
 const PlaceOrderScreen = ({ history }) => {
 	const dispatch = useDispatch()
@@ -137,18 +48,32 @@ const PlaceOrderScreen = ({ history }) => {
 		// eslint-disable-next-line
 	}, [history, success]) // Dependencies, on change they fire off useEffect
 
-	const placeOrderHandler = () => {
-		dispatch(
-			createOrder({
-				orderItems: cart.cartItems,
-				shippingAddress: cart.shippingAddress,
-				paymentMethod: cart.paymentMethod,
-				itemsPrice: cart.itemsPrice,
-				shippingPrice: cart.shippingPrice,
-				taxPrice: cart.taxPrice,
-				totalPrice: cart.totalPrice,
-			})
-		)
+	const  placeOrderHandler = async () => {
+		const order = {
+			orderItems: cart.cartItems,
+			shippingAddress: cart.shippingAddress,
+			paymentMethod: cart.paymentMethod,
+			itemsPrice: cart.itemsPrice,
+			shippingPrice: cart.shippingPrice,
+			taxPrice: cart.taxPrice,
+			totalPrice: cart.totalPrice,
+		};
+		const userInfo = JSON.parse(localStorage.userInfo);
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${userInfo.token}`,
+			},
+		}
+		const result = await axios.post('/api/orders', order, config)
+	
+		if (!result) {
+			alert("Server error. Are you online?");
+			return;
+		}
+
+		localStorage.removeItem('cartItems');
+		history.push(`/order/${result.data._id}`)
 	}
 
 	return (
@@ -252,7 +177,7 @@ const PlaceOrderScreen = ({ history }) => {
 									type='button'
 									className='btn-block'
 									disabled={cart.cartItems === 0}
-									onClick={() => displayRazorpay(cart)}
+									onClick={placeOrderHandler}
 								>
 									Place Order
 								</Button>
