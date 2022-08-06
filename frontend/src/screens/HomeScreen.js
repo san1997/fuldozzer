@@ -21,7 +21,7 @@ const HomeScreen = ({ match, history }) => {
 	const userLogin = useSelector((state) => state.userLogin)
 	const { userInfo } = userLogin
 	if (!userInfo) {
-		history.replace('/login');
+		history.replace('/about-us');
 	}
 
 	// useSelector is to grab what we want from the state

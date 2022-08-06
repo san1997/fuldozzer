@@ -1,5 +1,6 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
+import { COMPANY_NAME } from '../constants'
 
 const Meta = ({ title, description, keywords, author }) => {
 	return (
@@ -15,7 +16,7 @@ const Meta = ({ title, description, keywords, author }) => {
 }
 
 Meta.defaultProps = {
-	title: 'React E-Commerce | Home',
+	title: COMPANY_NAME,
 	description: 'Best products at an affordable price',
 	keywords: 'buy, iphone, electronics, South, Africa',
 	author: 'Melvin Kisten',

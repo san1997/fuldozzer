@@ -6,6 +6,7 @@ import { Navbar, Nav, Container, NavDropdown, Image } from 'react-bootstrap'
 import SearchBox from './SearchBox'
 import { logout } from '../actions/userActions'
 import './Header.css';
+import { COMPANY_NAME } from '../constants'
 
 const Header = () => {
 	const dispatch = useDispatch()
@@ -30,10 +31,13 @@ const Header = () => {
 				<Container>
 					{/* Home */}
 					<LinkContainer to='/'>
+						<div className='company-branding'>
 						<Image
 							className="company-logo"
 							src={'https://www.kindpng.com/picc/m/90-904149_pharmacy-capsule-logo-clipart-png-download-transparent-png.png'} 
 							fluid />
+						<div className='company-name'>{COMPANY_NAME}</div>
+						</div>
 					</LinkContainer>
 					<Navbar.Toggle aria-controls='basic-navbar-nav' />
 					<Navbar.Collapse id='basic-navbar-nav'>

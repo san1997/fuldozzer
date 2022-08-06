@@ -19,6 +19,7 @@ import ProductListScreen from './screens/ProductListScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
 import ResetPasswordScreen from './screens/ResetPasswordScreen'
+import LandingScreen from './screens/LandingScreeen'
 
 const App = () => {
 	return (
@@ -76,6 +77,8 @@ const App = () => {
 					<Route path='/page/:pageNumber' component={HomeScreen} exact />
 					{/* HomeScreen */}
 					<Route path='/' component={HomeScreen} exact />
+					{/* About us */}
+					<Route path='/about-us' component={LandingScreen} exact />
 				</Container>
 			</main>
 			<Footer />

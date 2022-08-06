@@ -7,16 +7,17 @@ const Footer = () => {
 			<Container>
 				<Row>
 					<Col className='text-center py-3'>
-						{/* Melvin Kisten */}
 						<a
 							rel='noopener noreferrer'
-							href='https://github.com/iammelvink'
+							href='http://fuldose.com/about-us'
 							target='_blank'
 							className='melvin-kisten'
 						>
-							<i className='fas fa-user-circle'></i> Melvin Kisten Github
+							<i className='fas fa-user-circle'></i> Fuldose.com
 						</a>
-						Copyright &copy; React E-Commerce
+						
+						<i className='fa fa-phone' style={{marginLeft: '1em'}}></i>8950253211, 7417204257
+						<i className='fa fa-at' style={{marginLeft: '1em'}}></i>fuldozzer@gmail.com
 					</Col>
 				</Row>
 			</Container>
